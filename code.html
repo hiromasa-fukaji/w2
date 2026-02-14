@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Viewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 300;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(0, 119, 255, 0.15);
+            border-bottom: 1px solid rgba(0, 119, 255, 0.3);
+        }
+
+        .header a {
+            color: #0077ff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+
+        .header a:hover {
+            opacity: 0.7;
+        }
+
+        .project-name {
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .code-container {
+            padding: 20px 40px 40px;
+        }
+
+        pre {
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        pre code.hljs {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            padding: 24px;
+        }
+
+        .error {
+            color: #ff6b6b;
+            padding: 40px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <a href="index.html">← Back to Gallery</a>
+        <span class="project-name" id="projectName"></span>
+    </div>
+    <div class="code-container">
+        <pre><code class="language-javascript" id="codeBlock">Loading...</code></pre>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const project = params.get('project');
+        const nameEl = document.getElementById('projectName');
+        const codeEl = document.getElementById('codeBlock');
+
+        if (!project) {
+            codeEl.textContent = 'Error: No project specified.';
+            codeEl.classList.remove('language-javascript');
+        } else {
+            nameEl.textContent = project + ' / sketch.js';
+            fetch(project + '/sketch.js')
+                .then(res => {
+                    if (!res.ok) throw new Error('File not found');
+                    return res.text();
+                })
+                .then(code => {
+                    codeEl.textContent = code;
+                    hljs.highlightElement(codeEl);
+                })
+                .catch(err => {
+                    codeEl.textContent = 'Error: Could not load sketch.js\n' + err.message;
+                    codeEl.classList.remove('language-javascript');
+                });
+        }
+    </script>
+</body>
+
+</html>
